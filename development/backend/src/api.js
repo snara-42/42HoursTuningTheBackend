@@ -32,7 +32,7 @@ log4js.configure({
 const logger = log4js.getLogger('system');
 */
 
-const mylog = (obj) => {
+const mylog = (obj) => { return;
 	const a = false;
 	if (a && Array.isArray(obj)) {
 		for (const e of obj) {

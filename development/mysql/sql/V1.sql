@@ -37,4 +37,3 @@ ALTER TABLE `session` ADD INDEX `user_id_index` (`linked_user_id`);
 ALTER TABLE `session` ADD INDEX `created_at_index` (`created_at`);
 
 ALTER TABLE `user` ADD INDEX `user_id_index` (`user_id`);
-
