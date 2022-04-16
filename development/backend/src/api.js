@@ -1,3 +1,14 @@
+const log4js = require('log4js');
+log4js.configure({
+	appenders : {
+		system : {type : 'file', filename : 'system.log'}
+	},
+	categories : {
+		default : {appenders : ['system'], level : 'debug'},
+	}
+});
+const logger = log4js.getLogger('system');
+
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
@@ -5,28 +16,28 @@ const jimp = require('jimp');
 
 const mysql = require('mysql2/promise');
 
-
 // MEMO: 設定項目はここを参考にした
 // https://github.com/sidorares/node-mysql2#api-and-configuration
 // https://github.com/mysqljs/mysql
 const mysqlOption = {
-  host: 'mysql',
-  user: 'backend',
-  password: 'backend',
-  database: 'app',
-  waitForConnections: true,
-  connectionLimit: 10,
+	host: 'mysql',
+	user: 'backend',
+	password: 'backend',
+	database: 'app',
+	waitForConnections: true,
+	connectionLimit: 10,
 };
 const pool = mysql.createPool(mysqlOption);
 
 const mylog = (obj) => {
-	if (false && Array.isArray(obj)) {
+	const a = false;
+	if (a && Array.isArray(obj)) {
 		for (const e of obj) {
-			console.log(e);
+			logger.debug(e);
 		}
 		return;
 	}
-	console.log(obj);
+	logger.debug(obj);
 };
 
 const getLinkedUser = async (headers) => {
@@ -84,11 +95,13 @@ const postRecords = async (req, res) => {
 		query += ',(?, ?, ?, now())';
 		args.push([newId, `${e.fileId}`, `${e.thumbFileId}`]);
 	}
-	await pool.query( `INSERT INTO record_item_file
+
+	const	insertQs =  `INSERT INTO record_item_file
 		(linked_record_id, linked_file_id, linked_thumbnail_file_id, created_at)
-		VALUES` + query.substr(1),
-		args,
-	);
+		VALUES ` + query.substr(1);
+	mylog(insertQs);
+	mylog(args);
+	await pool.query(insertQs, args,);
 
 	res.send({ recordId: newId });
 };
@@ -105,7 +118,7 @@ const getRecord = async (req, res) => {
 
 	const recordId = req.params.recordId; 
 
-	const [recordResult] = await pool.query(`SELECT * FROM record WHERE record_id = ?`, [`${recordId}`]);
+	const [recordResult] = await pool.query(`SELECT * FROM record WHERE record_id = ? LIMIT 1`, [`${recordId}`]);
 	mylog(recordResult);
 
 	if (recordResult.length !== 1) {
@@ -139,10 +152,10 @@ const getRecord = async (req, res) => {
 
 	const searchPrimaryGroupQs = `SELECT * FROM group_info i WHERE EXISTS 
 	(SELECT m.group_id FROM group_member m
-	WHERE m.user_id = ? AND m.is_primary = true AND i.group_id = m.group_id_LIMIT 1) LIMIT 1`;
+	WHERE m.user_id = ? AND m.is_primary = true AND i.group_id = m.group_id LIMIT 1) LIMIT 1`;
 	const [primaryResult] = await pool.query(searchPrimaryGroupQs, [line.created_by]);
 	if (primaryResult.length === 1) {
-		recordInfo.createdByPrimaryGroupName = groupResult[0].name;
+		recordInfo.createdByPrimaryGroupName = primaryResult[0].name;
 	}
 
 	const searchGroupQs = `SELECT i.name FROM group_info i WHERE i.group_id = ? LIMIT 1`;
