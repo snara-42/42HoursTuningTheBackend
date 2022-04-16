@@ -19,7 +19,7 @@ const mysqlOption = {
 };
 const pool = mysql.createPool(mysqlOption);
 
-
+/*
 const log4js = require('log4js')
 log4js.configure({
 	appenders : {
@@ -30,15 +30,17 @@ log4js.configure({
 	}
 });
 const logger = log4js.getLogger('system');
+*/
 
 const mylog = (obj) => {
-	if (Array.isArray(obj)) {
+	const a = false;
+	if (a && Array.isArray(obj)) {
 		for (const e of obj) {
-			logger.debug(e);
+			console.log(e);
 		}
 		return;
 	}
-	logger.debug(obj);
+	console.log(obj);
 };
 
 const getLinkedUser = async (headers) => {
