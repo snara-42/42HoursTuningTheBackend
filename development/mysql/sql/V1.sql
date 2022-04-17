@@ -9,6 +9,7 @@ ALTER TABLE `group_info` ADD INDEX `group_id_index` (`group_id`);
 ALTER TABLE `group_member` ADD INDEX `group_id_index` (`group_id`);
 ALTER TABLE `group_member` ADD INDEX `user_id_index` (`user_id`);
 
+ALTER TABLE `record` ADD INDEX `status_index` (`status`);
 ALTER TABLE `record` ADD INDEX `record_id_index` (`record_id`);
 ALTER TABLE `record` ADD INDEX `category_id_index` (`category_id`);
 ALTER TABLE `record` ADD INDEX `application_group_index` (`application_group`);
